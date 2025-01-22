@@ -96,7 +96,7 @@ prompt_adapter = AppScenePromptTemplateAdapter(
     template_scene=ChatScene.ExcelLearning.value(),
     stream_out=PROMPT_NEED_STREAM_OUT,
     output_parser=LearningExcelOutputParser(is_stream_out=PROMPT_NEED_STREAM_OUT),
-    need_historical_messages=False,
+    need_historical_messages=True,
     temperature=PROMPT_TEMPERATURE,
 )
 CFG.prompt_template_registry.register(prompt_adapter, is_default=True)

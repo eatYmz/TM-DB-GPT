@@ -61,7 +61,7 @@ class ConnectorManager(BaseComponent):
         from dbgpt.datasource.rdbms.dialect.oceanbase.ob_dialect import (  # noqa: F401
             OBDialect,
         )
-
+        from dbgpt.datasource.rdbms.conn_oracle import OracleConnector  # 注册Oracle数据库
         from .connect_config_db import ConnectConfigEntity  # noqa: F401
 
     def before_start(self):

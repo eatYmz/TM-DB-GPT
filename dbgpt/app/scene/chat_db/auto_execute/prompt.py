@@ -17,30 +17,44 @@ _PROMPT_SCENE_DEFINE_EN = "You are a database expert. "
 _PROMPT_SCENE_DEFINE_ZH = "你是一个数据库专家. "
 
 _DEFAULT_TEMPLATE_EN = """
-Please answer the user's question based on the database selected by the user and some of the available table structure definitions of the database.
+history_messages:
+    {history_messages}
+
+Please answer the user's question based on the database selected by the user and some of the available table structure definitions of the database. 
+Before proceeding, check if the user's question relates to the context of the historical conversation:
+    1. If yes, incorporate relevant historical context into your answer.
+    2. If not, focus solely on the current question.
+
 Database name:
      {db_name}
 Table structure definition:
      {table_info}
 
 Constraint:
-    1.Please understand the user's intention based on the user's question, and use the given table structure definition to create a grammatically correct {dialect} sql. If sql is not required, answer the user's question directly.. 
-    2.Always limit the query to a maximum of {top_k} results unless the user specifies in the question the specific number of rows of data he wishes to obtain.
-    3.You can only use the tables provided in the table structure information to generate sql. If you cannot generate sql based on the provided table structure, please say: "The table structure information provided is not enough to generate sql queries." It is prohibited to fabricate information at will.
-    4.Please be careful not to mistake the relationship between tables and columns when generating SQL.
-    5.Please check the correctness of the SQL and ensure that the query performance is optimized under correct conditions.
-    6.Please choose the best one from the display methods given below for data rendering, and put the type name into the name parameter value that returns the required format. If you cannot find the most suitable one, use 'Table' as the display method. , the available data display methods are as follows: {display_type}
-    
+    1. Please understand the user's intention based on the user's question and use the given table structure definition to create a grammatically correct {dialect} SQL query. If an SQL query is not required, answer the user's question directly.
+    2. Always limit the query to a maximum of {top_k} results unless the user specifies in the question the specific number of rows of data they wish to obtain.
+    3. You can only use the tables provided in the table structure information to generate SQL. If you cannot generate SQL based on the provided table structure, please say: "The table structure information provided is not enough to generate SQL queries." Fabricating information is strictly prohibited.
+    4. Carefully avoid mistaking the relationship between tables and columns when generating SQL.
+    5. Check the correctness of the SQL and ensure the query performance is optimized under correct conditions.
+    6. If the SQL execution result is empty, respond with: "The data related to '{user_input}' is not found." Provide potential reasons if appropriate, but avoid returning an empty data set.
+    7. Choose the best data rendering method from the options given below and use it in the "name" parameter value. If none are suitable, use 'Table'. Available methods: {display_type}
+
 User Question:
     {user_input}
+
 Please think step by step and respond according to the following JSON format:
     {response}
-Ensure the response is correct json and can be parsed by Python json.loads.
-
+Ensure the response is valid JSON and can be parsed by Python json.loads.
 """
 
 _DEFAULT_TEMPLATE_ZH = """
-请根据用户选择的数据库和该库的部分可用表结构定义来回答用户问题.
+历史对话上下文:
+    {history_messages}
+
+请根据用户选择的数据库和该库的部分可用表结构定义来回答用户问题。
+在回答之前，请检查用户问题是否与历史对话上下文相关：
+    1. 如果相关，结合历史上下文提供答案。
+    2. 如果不相关，则专注于当前问题。
 数据库名:
     {db_name}
 表结构定义:
@@ -52,7 +66,8 @@ _DEFAULT_TEMPLATE_ZH = """
     3. 只能使用表结构信息中提供的表来生成 sql，如果无法根据提供的表结构中生成 sql ，请说：“提供的表结构信息不足以生成 sql 查询。” 禁止随意捏造信息。
     4. 请注意生成SQL时不要弄错表和列的关系
     5. 请检查SQL的正确性，并保证正确的情况下优化查询性能
-    6.请从如下给出的展示方式种选择最优的一种用以进行数据渲染，将类型名称放入返回要求格式的name参数值种，如果找不到最合适的则使用'Table'作为展示方式，可用数据展示方式如下: {display_type}
+    6. 如果 SQL 执行结果为空，请回复：“与‘{user_input}’相关的数据为空。” 并提供可能的原因，但不要返回空数据集。
+    7. 请从如下给出的展示方式种选择最优的一种用以进行数据渲染，将类型名称放入返回要求格式的name参数值种，如果找不到最合适的则使用'Table'作为展示方式，可用数据展示方式如下: {display_type}
 用户问题:
     {user_input}
 请一步步思考并按照以下JSON格式回复：
@@ -103,6 +118,6 @@ prompt_adapter = AppScenePromptTemplateAdapter(
     stream_out=PROMPT_NEED_STREAM_OUT,
     output_parser=DbChatOutputParser(is_stream_out=PROMPT_NEED_STREAM_OUT),
     temperature=PROMPT_TEMPERATURE,
-    need_historical_messages=False,
+    need_historical_messages=True,
 )
 CFG.prompt_template_registry.register(prompt_adapter, is_default=True)

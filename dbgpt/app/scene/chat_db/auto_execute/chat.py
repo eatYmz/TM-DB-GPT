@@ -76,6 +76,7 @@ class ChatWithDbAutoExecute(BaseChat):
             "dialect": self.database.dialect,
             "table_info": table_infos,
             "display_type": self._generate_numbered_list(),
+            "history_messages": self.history_messages
         }
         return input_values
 
@@ -87,3 +88,33 @@ class ChatWithDbAutoExecute(BaseChat):
     def do_action(self, prompt_response):
         print(f"do_action:{prompt_response}")
         return self.database.run_to_df
+    
+    def format_history_messages(self, messages):
+        """格式化历史消息为易读的格式"""
+        if not messages:
+            return "暂无历史对话"
+            
+        formatted = []
+        for msg in messages:
+            # 获取角色和内容
+            role = "用户" if msg.__class__.__name__ == "HumanMessage" else "助手"
+            content = msg.content
+            
+            # 如果内容是 JSON 字符串，只提取有用的部分
+            if role == "助手" and content.startswith("{"):
+                try:
+                    content_dict = json.loads(content)
+                    # 提取思考过程或直接回复
+                    if content_dict.get("direct_response"):
+                        content = content_dict["direct_response"]
+                    elif content_dict.get("thoughts"):
+                        content = content_dict["thoughts"]
+                except:
+                    pass  # 如果解析失败，使用原始内容
+                    
+            # 清理和格式化内容
+            content = content.strip()
+            if content:
+                formatted.append(f"{role}: {content}")
+                
+        return "\n".join(formatted) if formatted else "暂无历史对话"
