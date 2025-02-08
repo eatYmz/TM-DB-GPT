@@ -46,9 +46,13 @@ def create_access_token(user_id: str, expires_delta: Optional[timedelta] = None)
     
     return encoded_jwt
 
-def verify_token(token: str) -> dict:
+def verify_security_token(token: str) -> dict:
     """验证令牌"""
     try:
+        # 处理 Bearer 前缀
+        if token.startswith('Bearer '):
+            token = token.split(' ')[1]
+
         payload = jwt.decode(
             token,
             auth_settings.JWT_SECRET_KEY,
@@ -68,7 +72,7 @@ def verify_token(token: str) -> dict:
             detail="Token has expired",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    except jwt.JWTError:
+    except jwt.InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",

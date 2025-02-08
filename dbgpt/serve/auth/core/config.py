@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from typing import Optional
+from typing import Optional, List
 import os
 from functools import lru_cache
 
@@ -17,6 +17,7 @@ class AuthSettings(BaseSettings):
     # 系统设置
     ALLOW_REGISTRATION: bool = True  # 是否允许注册
     DEFAULT_ROLE: str = "normal"     # 默认角色
+    EXCLUDE_PATHS: List[str] = ["/auth/login", "/auth/register"]
     
     # Redis设置
     REDIS_HOST: str = os.getenv("AUTH_REDIS_HOST", "localhost")

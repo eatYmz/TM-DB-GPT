@@ -1,13 +1,3 @@
-from .core.config import get_auth_settings
-from .models.user import User
-from .api.schemas import UserRequest, LoginRequest, RegisterRequest, AuthResponse, CommonResponse
+from .api.endpoint import router as auth_router
 
-__all__ = [
-    'get_auth_settings',
-    'User',
-    'UserRequest',
-    'LoginRequest',
-    'RegisterRequest',
-    'AuthResponse',
-    'CommonResponse'
-]
+__all__ = ['auth_router']

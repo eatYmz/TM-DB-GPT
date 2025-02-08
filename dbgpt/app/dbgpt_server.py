@@ -39,6 +39,8 @@ from dbgpt.util.utils import (
     setup_http_service_logging,
     setup_logging,
 )
+from dbgpt.serve.auth.middleware.auth import AuthMiddleware
+from dbgpt.serve.auth.api.endpoint import router as auth_router
 
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_PATH)
@@ -91,6 +93,9 @@ def mount_routers(app: FastAPI):
     )
 
     app.include_router(recommend_question_v1, prefix="/api", tags=["RecommendQuestion"])
+
+    # 添加 auth 路由
+    app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 
 
 def mount_static_files(app: FastAPI):
@@ -166,6 +171,20 @@ def initialize_app(param: WebServerParameters = None, args: List[str] = None):
         )
 
     server_init(param, system_app)
+
+    # 在 mount_routers 之前添加中间件
+    app.add_middleware(
+        AuthMiddleware,
+        exclude_paths=[
+            "/auth/login", 
+            "/auth/register",
+            "/docs",
+            "/redoc",
+            "/openapi.json"
+        ],
+        protected_paths=["/auth"]  # 只保护 /auth 开头的路径
+    )
+    
     mount_routers(app)
     model_start_listener = _create_model_start_listener(system_app)
     initialize_components(
