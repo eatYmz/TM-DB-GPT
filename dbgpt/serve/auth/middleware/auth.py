@@ -35,6 +35,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         # 获取并验证 token
         token = request.headers.get("Authorization")
+        # 处理 Bearer 前缀
+        if token.startswith('Bearer '):
+            token = token.split(' ')[1]
+                
         if not token:
             return JSONResponse(
                 status_code=401,
@@ -42,9 +46,19 @@ class AuthMiddleware(BaseHTTPMiddleware):
             )
 
         try:
-            # 直接使用导入的函数
-            payload = verify_security_token(token)
-            request.state.user = payload
+            # 验证 token 并获取会话
+            user_info = self.auth_service.session_manager.get_user_session(token)
+            
+            if not user_info:
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "Session expired or invalid -middleware"}
+                )
+            
+            # 刷新会话过期时间
+            self.auth_service.session_manager.refresh_session(token)
+            
+            request.state.user = user_info
             return await call_next(request)
         except Exception as e:
             return JSONResponse(

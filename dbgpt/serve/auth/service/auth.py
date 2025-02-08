@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import redis
 import json
 import uuid
+import logging
 
 from dbgpt.serve.auth.api.schemas import UserRequest, RegisterRequest, AuthResponse
 from dbgpt.serve.auth.core.config import get_auth_settings
@@ -20,6 +21,7 @@ from dbgpt.serve.auth.dao.user_dao import UserDao
 from dbgpt.storage.metadata import db
 
 auth_settings = get_auth_settings()
+logger = logging.getLogger(__name__)
 
 class RedisSessionManager:
     """Redis会话管理器"""
@@ -74,6 +76,42 @@ class RedisSessionManager:
         # 从用户活跃token中移除
         pipe.srem(f"{self.user_prefix}{user_id}:tokens", token)
         pipe.execute()
+
+    def refresh_session(self, token: str) -> bool:
+        """刷新会话过期时间"""
+        try:
+            # 处理 Bearer 前缀
+            if token.startswith('Bearer '):
+                token = token.split(' ')[1]
+                
+            session_key = f"{self.prefix}{token}"
+            
+            # 获取当前会话数据
+            session_data = self.redis_client.get(session_key)
+            if session_data:
+                session_info = json.loads(session_data)
+                user_id = session_info["user_info"]["user_id"]
+                user_key = f"{self.user_prefix}{user_id}"
+                
+                # 更新最后活动时间
+                session_info["last_activity"] = datetime.utcnow().isoformat()
+                
+                pipe = self.redis_client.pipeline()
+                # 刷新会话过期时间
+                pipe.setex(
+                    session_key,
+                    timedelta(minutes=auth_settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+                    json.dumps(session_info)
+                )
+                # 刷新用户token集合的过期时间
+                if user_key:
+                    pipe.expire(f"{user_key}:tokens", timedelta(minutes=auth_settings.ACCESS_TOKEN_EXPIRE_MINUTES))
+                pipe.execute()
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Failed to refresh session: {str(e)}")
+            return False
 
 class AuthService:
     def __init__(self, redis_url: str):
@@ -186,15 +224,12 @@ class AuthService:
     async def get_current_user(self, token: str) -> UserRequest:
         """获取当前用户"""
         try:
-            # 使用导入的 verify_security_token 函数
-            payload = verify_security_token(token)
-            
             # 从Redis获取用户会话信息
             user_info = self.session_manager.get_user_session(token)
             if not user_info:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Session expired or invalid"
+                    detail="Session expired or invalid ——get_current_user"
                 )
             
             return UserRequest(**user_info)
