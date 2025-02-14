@@ -14,6 +14,19 @@ export interface UserModel {
   gmt_modified?: string;
 }
 
+export interface ApiUserModel {
+  user_id: string;
+  user_no: string | null;
+  real_name: string | null;
+  user_name: string;
+  user_channel: string | null;
+  role: string;
+  nick_name: string;
+  email: string;
+  avatar_url: string | null;
+  nick_name_like: string | null;
+}
+
 const UserDTO = sequelize.define<Model<UserModel, Partial<UserModel>>>(
   'User',
   {

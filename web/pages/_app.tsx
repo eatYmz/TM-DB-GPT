@@ -56,7 +56,6 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const { isMenuExpand, mode } = useContext(ChatContext);
   const { i18n } = useTranslation();
   const [isLogin, setIsLogin] = useState(false);
-
   const router = useRouter();
 
   // 登录检测
@@ -85,7 +84,32 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
     handleAuth();
   }, []);
 
-  if (!isLogin) {
+  // 添加无需布局的路由列表
+  const noLayoutRoutes = ['/login'];
+  const isNoLayoutRoute = noLayoutRoutes.includes(router.pathname);
+
+  // 如果是登录页面，直接返回内容
+  if (isNoLayoutRoute) {
+    return (
+      <ConfigProvider
+        locale={i18n.language === 'en' ? enUS : zhCN}
+        theme={{
+          token: {
+            colorPrimary: '#0C75FC',
+            borderRadius: 4,
+          },
+          algorithm: mode === 'dark' ? antdDarkTheme : undefined,
+        }}
+      >
+        <App>{children}</App>
+      </ConfigProvider>
+    );
+  }
+
+  // 如果未登录且不是登录页面，重定向到登录页
+  if (!isLogin && !isNoLayoutRoute) {
+    // 可以添加重定向逻辑
+    //router.push('/login');
     return null;
   }
 
