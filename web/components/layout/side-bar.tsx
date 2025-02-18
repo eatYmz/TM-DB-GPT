@@ -47,6 +47,9 @@ function smallMenuItemStyle(active?: boolean) {
   }`;
 }
 
+// 添加版本号常量
+const APP_VERSION = 'beat-0.0.1'; // 这里替换为实际的版本号
+
 function SideBar() {
   // const { chatId, scene, isMenuExpand, refreshDialogList, setIsMenuExpand, setAgent, mode, setMode, adminList } =
   //   useContext(ChatContext);
@@ -443,6 +446,10 @@ function SideBar() {
                 </div>
               </Tooltip>
             ))}
+          {/* 添加收起状态下的版本号 */}
+          <div className="text-xs text-center text-gray-500 mt-2">
+            {APP_VERSION}
+          </div>
         </div>
       </div>
     );
@@ -489,31 +496,37 @@ function SideBar() {
             <UserBar />
           </div>
         </span>
-        <div className='flex items-center justify-around py-4 mt-2 border-t border-dashed border-gray-200 dark:border-gray-700'>
-          {settings.map(item => (
-            <div key={item.key}>
-              <Popover content={item.name}>
-                <div className='flex-1 flex items-center justify-center cursor-pointer text-xl' onClick={item.onClick}>
-                  {item.icon}
-                </div>
-              </Popover>
-              {/* {item.items ? (
-                <Dropdown
-                  menu={{ items: item.items, selectable: true, onSelect: item.onSelect, defaultSelectedKeys: item.defaultSelectedKeys }}
-                  placement={item.placement || 'top'}
-                  arrow
-                >
-                  <span onClick={item.onClick}>{item.icon}</span>
-                </Dropdown>
-              ) : (
+        <div className='flex flex-col'>
+          <div className='flex items-center justify-around py-4 mt-2 border-t border-dashed border-gray-200 dark:border-gray-700'>
+            {settings.map(item => (
+              <div key={item.key}>
                 <Popover content={item.name}>
-                  <div className="flex-1 flex items-center justify-center cursor-pointer text-xl" onClick={item.onClick}>
+                  <div className='flex-1 flex items-center justify-center cursor-pointer text-xl' onClick={item.onClick}>
                     {item.icon}
                   </div>
                 </Popover>
-              )} */}
-            </div>
-          ))}
+                {/* {item.items ? (
+                  <Dropdown
+                    menu={{ items: item.items, selectable: true, onSelect: item.onSelect, defaultSelectedKeys: item.defaultSelectedKeys }}
+                    placement={item.placement || 'top'}
+                    arrow
+                  >
+                    <span onClick={item.onClick}>{item.icon}</span>
+                  </Dropdown>
+                ) : (
+                  <Popover content={item.name}>
+                    <div className="flex-1 flex items-center justify-center cursor-pointer text-xl" onClick={item.onClick}>
+                      {item.icon}
+                    </div>
+                  </Popover>
+                )} */}
+              </div>
+            ))}
+          </div>
+          {/* 添加展开状态下的版本号 */}
+          <div className="text-xs text-center text-gray-500 mt-2">
+            {APP_VERSION}
+          </div>
         </div>
       </div>
     </div>

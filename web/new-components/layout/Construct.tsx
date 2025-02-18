@@ -30,12 +30,12 @@ function ConstructLayout({ children }: { children: React.ReactNode }) {
       //   </Button>
       // ),
     },
-    {
-      key: 'flow',
-      name: t('awel_flow'),
-      icon: <ForkOutlined />,
-      path: '/flow',
-    },
+    // {
+    //   key: 'flow',
+    //   name: t('awel_flow'),
+    //   icon: <ForkOutlined />,
+    //   path: '/flow',
+    // },
     {
       key: 'models',
       name: t('model_manage'),
@@ -66,12 +66,12 @@ function ConstructLayout({ children }: { children: React.ReactNode }) {
       icon: <MessageOutlined />,
       path: '/prompt',
     },
-    {
-      key: 'dbgpts',
-      name: t('dbgpts_community'),
-      path: '/dbgpts',
-      icon: <BuildOutlined />,
-    },
+    // {
+    //   key: 'dbgpts',
+    //   name: t('dbgpts_community'),
+    //   path: '/dbgpts',
+    //   icon: <BuildOutlined />,
+    // },
   ];
   const router = useRouter();
   const activeKey = router.pathname.split('/')[2];
