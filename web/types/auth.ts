@@ -36,5 +36,6 @@ export interface RegisterParams {
   username: string;
   password: string;
   email: string;
+  nickname: string;
   // 其他注册需要的字段
 }

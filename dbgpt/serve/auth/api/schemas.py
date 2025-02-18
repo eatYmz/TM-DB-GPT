@@ -1,5 +1,8 @@
 from typing import Optional, Dict
 from pydantic import BaseModel, EmailStr
+from dbgpt.serve.auth.core.config import get_auth_settings
+
+auth_settings = get_auth_settings()
 
 class UserRequest(BaseModel):
     """用户信息模型"""
@@ -47,7 +50,7 @@ class AuthResponse(BaseModel):
     """认证响应"""
     access_token: str
     token_type: str = "bearer"
-    expires_in: int = 3600  # 默认1小时
+    expires_in: int = auth_settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     user: UserRequest
 
 class CommonResponse(BaseModel):

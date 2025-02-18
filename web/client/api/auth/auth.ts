@@ -19,5 +19,5 @@ export const authLogout = () => {
  * 注册
  */
 export const authRegister = (params: RegisterParams) => {
-  return POST<RegisterParams, void>('/auth/register', params);
+  return POST<RegisterParams, LoginResponse>('/auth/register', params);
 };

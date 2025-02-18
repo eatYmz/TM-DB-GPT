@@ -85,7 +85,7 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
   }, []);
 
   // 添加无需布局的路由列表
-  const noLayoutRoutes = ['/login'];
+  const noLayoutRoutes = ['/login', '/register'];
   const isNoLayoutRoute = noLayoutRoutes.includes(router.pathname);
 
   // 如果是登录页面，直接返回内容
