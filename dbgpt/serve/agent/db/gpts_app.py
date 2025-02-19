@@ -601,6 +601,7 @@ class GptsAppDao(BaseDao):
                         or_(
                             GptsAppEntity.user_code == query.user_code,
                             GptsAppEntity.admins.like(f"%{query.user_code}%"),
+                            GptsAppEntity.user_code.is_(None)  # 添加这个条件
                         )
                     )
                 if query.sys_code:

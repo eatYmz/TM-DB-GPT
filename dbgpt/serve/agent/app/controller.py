@@ -47,10 +47,10 @@ async def app_list(
     query: GptsAppQuery, user_info: UserRequest = Depends(get_user_from_headers)
 ):
     try:
-        # query.user_code = (
-        #     user_info.user_id if user_info.user_id is not None else query.user_code
-        # )
-        query.ignore_user = "true"
+        query.user_code = (
+            user_info.user_id if user_info.user_id is not None else query.user_code
+        )
+        query.ignore_user = "false"
         return Result.succ(gpts_dao.app_list(query, True))
     except Exception as ex:
         logger.exception("app_list exception!")
