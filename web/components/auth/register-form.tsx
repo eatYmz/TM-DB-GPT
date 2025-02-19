@@ -38,7 +38,7 @@ export const RegisterForm = () => {
         // 存储过期时间
         localStorage.setItem(
           STORAGE_USERINFO_VALID_TIME_KEY, 
-          (Date.now() + registerData.expires_in).toString()
+          (Date.now() + registerData.expires_in * 1000).toString()
         );
         
         // 设置成功状态

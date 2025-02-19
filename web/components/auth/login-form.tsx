@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { message } from 'antd';
 import { TokenManager } from '@/utils/token';
 import { authLogin } from '@/client/api/auth/auth';
-import { LoginCredentials, LoginResponse } from '@/types/auth';
+import { LoginCredentials } from '@/types/auth';
 import { 
-  STORAGE_TOKEN_KET,
   STORAGE_USERINFO_KEY,
   STORAGE_USERINFO_VALID_TIME_KEY 
 } from '@/utils/constants/storage';
@@ -15,36 +15,44 @@ export const LoginForm = () => {
     username: '',
     password: '',
   });
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+    setLoading(true);
+
     try {
       const response = await authLogin(formData);
       const loginData = response.data;
       
       if (loginData.access_token) {
         // 存储 token
-        TokenManager.setToken(loginData.access_token);
+        TokenManager.setToken(loginData.access_token, loginData.expires_in);
         
         // 存储用户信息
         localStorage.setItem(STORAGE_USERINFO_KEY, JSON.stringify(loginData.user));
         
-        // 存储过期时间
-        localStorage.setItem(
-          STORAGE_USERINFO_VALID_TIME_KEY, 
-          (Date.now() + loginData.expires_in * 1000).toString()
-        );
+        // 显示成功消息
+        message.success('登录成功，正在跳转...', 1);
         
-        router.push('/');
+        // 延迟跳转，让用户看到成功提示
+        setTimeout(() => {
+          const redirectPath = router.query.from as string || '/';
+          router.push(redirectPath);
+        }, 1000);
       } else {
         setError('登录失败，请检查用户名和密码');
+        message.error('登录失败，请检查用户名和密码');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error);
-      setError('登录失败，请稍后重试');
+      const errorMessage = error.response?.data?.detail || '登录失败，请稍后重试';
+      setError(errorMessage);
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,6 +65,7 @@ export const LoginForm = () => {
           value={formData.username}
           onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           className="w-full p-2 border rounded"
+          disabled={loading}
         />
       </div>
       <div>
@@ -66,14 +75,17 @@ export const LoginForm = () => {
           value={formData.password}
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           className="w-full p-2 border rounded"
+          disabled={loading}
         />
       </div>
       {error && <div className="text-red-500">{error}</div>}
       <button 
         type="submit"
-        className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className={`w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 
+          ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        disabled={loading}
       >
-        Login
+        {loading ? '登录中...' : '登录'}
       </button>
     </form>
   );

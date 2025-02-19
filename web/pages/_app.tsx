@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import '../app/i18n';
 import '../nprogress.css';
 import '../styles/globals.css';
+import { TokenManager } from '@/utils/token';
 // import TopProgressBar from '@/components/layout/top-progress-bar';
 
 const antdDarkTheme: MappingAlgorithm = (seedToken, mapToken) => {
@@ -62,22 +63,20 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const handleAuth = async () => {
     setIsLogin(false);
     // 如果已有登录信息，直接展示首页
-    // if (localStorage.getItem(STORAGE_USERINFO_KEY)) {
-    //   setIsLogin(true);
-    //   return;
-    // }
+    const isValid = TokenManager.isTokenValid();
+    setIsLogin(isValid);
 
     // MOCK User info
-    const user = {
-      user_channel: `dbgpt`,
-      user_no: `001`,
-      nick_name: `dbgpt`,
-    };
-    if (user) {
-      localStorage.setItem(STORAGE_USERINFO_KEY, JSON.stringify(user));
-      localStorage.setItem(STORAGE_USERINFO_VALID_TIME_KEY, Date.now().toString());
-      setIsLogin(true);
-    }
+    // const user = {
+    //   user_channel: `dbgpt`,
+    //   user_no: `001`,
+    //   nick_name: `dbgpt`,
+    // };
+    // if (user) {
+    //   localStorage.setItem(STORAGE_USERINFO_KEY, JSON.stringify(user));
+    //   localStorage.setItem(STORAGE_USERINFO_VALID_TIME_KEY, Date.now().toString());
+    //   setIsLogin(true);
+    // }
   };
 
   useEffect(() => {
@@ -110,7 +109,7 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
   if (!isLogin && !isNoLayoutRoute) {
     // 可以添加重定向逻辑
     //router.push('/login');
-    return null;
+    return null; // 或者返回 null，因为 middleware 会处理重定向
   }
 
   const renderContent = () => {

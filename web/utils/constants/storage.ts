@@ -8,6 +8,8 @@ export const STORAGE_INIT_MESSAGE_KET = '__db_gpt_im_key';
 export const STORAGE_TOKEN_KET = '__db_gpt_tk_key';
 /** UserInfo */
 export const STORAGE_USERINFO_KEY = '__db_gpt_uinfo_key';
-
 /** UserInfoValidTime */
 export const STORAGE_USERINFO_VALID_TIME_KEY = '__db_gpt_uinfo_vt_key';
+
+/** Token 最大有效期 */
+export const STORAGE_TOKEN_MAX_AGE =  30 * 60; // 30分钟

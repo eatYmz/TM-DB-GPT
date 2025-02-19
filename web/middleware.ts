@@ -1,45 +1,37 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// 公开路径（不需要token）
-const publicPaths = [
-  '/login',
-  '/api/auth/login',
-  '/register',
-  '/api/auth/register',
-  '/',  // 假设首页是公开的
-];
+// 需要登录才能访问的路径
+const protectedPaths = ['/', '/chat', '/profile'];
 
-// 需要保护的路径
-const protectedPaths = [
-  '/logout',  // 登出需要保护
-  '/api/auth/logout',  // 登出API需要保护
-];
+export function middleware(request: NextRequest) {
+  // 获取当前路径
+  const path = request.nextUrl.pathname;
 
-export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  // 检查是否是需要保护的路径
+  if (protectedPaths.some(pp => path.startsWith(pp))) {
+    // 只能通过 cookies 检查 token
+    const token = request.cookies.get('token')?.value;
 
-  // 如果是公开路径，直接放行
-  if (publicPaths.includes(pathname)) {
-    return NextResponse.next();
-  }
-
-  // 如果不是受保护的路径，直接放行
-  if (!protectedPaths.some(path => pathname.startsWith(path))) {
-    return NextResponse.next();
-  }
-
-  // 获取请求头中的 token
-  const token = req.headers.get('Authorization')?.replace('Bearer ', '');
-
-  // 如果是受保护的路径且没有 token，重定向到登录页
-  if (!token) {
-    return NextResponse.redirect(new URL('/login', req.url));
+    // 如果没有 token，重定向到登录页
+    if (!token) {
+      const loginUrl = new URL('/login', request.url);
+      // 保存原始目标路径，登录后可以重定向回去
+      loginUrl.searchParams.set('from', path);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   return NextResponse.next();
 }
 
+// 配置中间件匹配的路径
 export const config = {
-  matcher: ['/((?!_next/static|favicon.ico).*)'],
+  matcher: [
+    /*
+     * 匹配所有需要保护的路径
+     * 排除 _next、api 路由、静态文件等
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|login|register).*)',
+  ],
 };
