@@ -81,7 +81,7 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     handleAuth();
-  }, []);
+  }, [router.pathname]);
 
   // 添加无需布局的路由列表
   const noLayoutRoutes = ['/login', '/register'];

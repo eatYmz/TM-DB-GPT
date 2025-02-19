@@ -28,20 +28,16 @@ export const LoginForm = () => {
       const loginData = response.data;
       
       if (loginData.access_token) {
-        // 存储 token
+        // 1. 先存储用户信息
+        localStorage.setItem(STORAGE_USERINFO_KEY, JSON.stringify(loginData.user));
+        // 2. 再设置 token
         TokenManager.setToken(loginData.access_token, loginData.expires_in);
         
-        // 存储用户信息
-        localStorage.setItem(STORAGE_USERINFO_KEY, JSON.stringify(loginData.user));
+        message.success('登录成功');
         
-        // 显示成功消息
-        message.success('登录成功，正在跳转...', 1);
-        
-        // 延迟跳转，让用户看到成功提示
-        setTimeout(() => {
-          const redirectPath = router.query.from as string || '/';
-          router.push(redirectPath);
-        }, 1000);
+        // 3. 直接跳转到目标页面
+        const redirectPath = router.query.from as string || '/';
+        router.push(redirectPath);
       } else {
         setError('登录失败，请检查用户名和密码');
         message.error('登录失败，请检查用户名和密码');
