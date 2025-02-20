@@ -88,3 +88,4 @@ export * from './prompt';
 export * from './request';
 export * from './tools';
 export * from './user';
+export * from './information';
