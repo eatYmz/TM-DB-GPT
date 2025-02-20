@@ -21,6 +21,7 @@ type SettingItem = {
   noDropdownItem?: boolean;
   onClick?: () => void;
   items?: ItemType[];
+  // items?: MenuProps['items'];
   onSelect?: (p: { key: string }) => void;
   defaultSelectedKeys?: string[];
   placement?: 'top' | 'topLeft';
@@ -288,13 +289,28 @@ function SideBar() {
         icon: (
           <Image
             key='image_construct'
-            src={pathname.startsWith('/construct') ? '/pictures/app_active.png' : '/pictures/app.png'}
+            src={pathname.startsWith('/construct') ? '/pictures/chat_active.png' : '/pictures/chat.png'}
             alt='construct_image'
             width={40}
             height={40}
           />
         ),
         path: '/construct/app',
+      },
+      {
+        key: 'information',
+        name: t('information'),
+        isActive: pathname === '/information',
+        icon: (
+          <Image
+            key='image_explore'
+            src={pathname === '/information' ? '/pictures/flow.png' : '/pictures/flow.png'}
+            alt='construct_image'
+            width={40}
+            height={40}
+          />
+        ),
+        path: '/information',
       },
     ];
     if (hasAdmin) {
