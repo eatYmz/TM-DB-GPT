@@ -97,9 +97,6 @@ def mount_routers(app: FastAPI):
     # 添加 auth 路由
     app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 
-    from dbgpt.app.information.api import router as information_v1
-
-    app.include_router(information_v1, prefix="/api", tags=["Information"])
 
 def mount_static_files(app: FastAPI):
     os.makedirs(STATIC_MESSAGE_IMG_PATH, exist_ok=True)
